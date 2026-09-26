@@ -48,6 +48,10 @@ export interface Story {
   sources: StorySource[];
   entityIds: string[];
   isBreaking?: boolean;
+  socialDiscussions?: {
+    twitter: any[];
+    reddit: any[];
+  };
 }
 
 export type EntityType = 'person' | 'organization' | 'institution' | 'location';

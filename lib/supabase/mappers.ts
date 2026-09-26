@@ -17,6 +17,7 @@ export interface ClusterRow {
   created_at: string | null;
   synthesis_shared_facts: string[] | null;
   entity_set: string[] | null;
+  social_discussions: any | null;
 }
 
 export interface ArticleRow {
@@ -231,6 +232,7 @@ export function mapClusterToStory(
     isBreaking: isBreakingStory(cluster.heat_index, cluster.velocity)
       ? true
       : undefined,
+    socialDiscussions: cluster.social_discussions ?? undefined,
   };
 }
 

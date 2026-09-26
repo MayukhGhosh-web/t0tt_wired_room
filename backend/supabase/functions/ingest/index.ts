@@ -120,22 +120,43 @@ serve(async () => {
   }
 
   // Phase 2: Sweep & Cluster
-  const { data: pending } = await supabase.from('articles').select('*').in('embedding_status', ['pending', 'failed']).limit(15);
+  const { data: pending } = await supabase.from('articles').select('*').in('embedding_status', ['pending', 'failed']).limit(30);
 
-  if (pending) {
-    for (const article of pending) {
-      try {
-        const textToEmbed = `${article.title}. ${article.snippet || ""}`;
-        const embedding = await getEmbedding(textToEmbed);
+  if (pending && pending.length > 0) {
+    const results = [];
+    
+    // Batch embeddings to avoid Gemini API 429 Rate Limits
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < pending.length; i += BATCH_SIZE) {
+      const batch = pending.slice(i, i + BATCH_SIZE);
+      const embedPromises = batch.map(async (article) => {
+        try {
+          const textToEmbed = `${article.title}. ${article.snippet || ""}`;
+          const embedding = await getEmbedding(textToEmbed);
+          return { article, embedding, error: null };
+        } catch (err) {
+          return { article, embedding: null, error: err };
+        }
+      });
+      
+      results.push(...(await Promise.all(embedPromises)));
+      
+      // Delay 1s between batches to respect rate limits
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    
+    // 2. Process clustering sequentially (to prevent pgvector lock contention)
+    for (const res of results) {
+      if (res.error) {
+        console.error("Embedding failure:", res.error);
+        await supabase.from('articles').update({ embedding_status: 'failed' }).eq('id', res.article.id);
+      } else {
         await supabase.rpc('process_article_clustering', {
-          p_article_id: article.id,
-          p_embedding: embedding,
-          p_raw_entities: article.raw_entity_terms || [],
-          p_snippet: article.snippet || ""
+          p_article_id: res.article.id,
+          p_embedding: res.embedding,
+          p_raw_entities: res.article.raw_entity_terms || [],
+          p_snippet: res.article.snippet || ""
         });
-      } catch (err) {
-        console.error("Embedding failure:", err);
-        await supabase.from('articles').update({ embedding_status: 'failed' }).eq('id', article.id);
       }
     }
   }

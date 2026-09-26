@@ -8,6 +8,8 @@ import { TrendingScore } from '@/components/trending-score';
 import { formatRelativeTime, formatFullDate } from '@/lib/format';
 import { ArrowLeft, ArrowRight, ExternalLink, KeyRound } from 'lucide-react';
 import { getUnsplashImageForStory } from '@/lib/unsplash';
+import { Suspense } from 'react';
+import { SocialDiscussions } from '@/components/social-discussions';
 
 export default async function StoryPage({
   params,
@@ -134,6 +136,8 @@ export default async function StoryPage({
 
         <aside className="space-y-4">
           <EntitySidebar entities={entities} />
+
+          <SocialDiscussions socialData={story.socialDiscussions} compact={true} />
 
           <div className="border border-border bg-card p-5">
             <h3 className="mb-3 font-serif text-lg font-bold tracking-tight">

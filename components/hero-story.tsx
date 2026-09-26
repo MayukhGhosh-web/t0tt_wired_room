@@ -5,8 +5,10 @@ import { TrendingScore } from '@/components/trending-score';
 import { SourceBadges } from '@/components/source-badges';
 import { formatRelativeTime } from '@/lib/format';
 import { getUnsplashImageForStory } from '@/lib/unsplash';
+import { SocialDiscussions } from '@/components/social-discussions';
 
 export async function HeroStory({ story, rank = 1 }: { story: Story; rank?: number }) {
+  console.log("HeroStory social data for:", story.id, story.socialDiscussions);
   const thumbnail = story.thumbnail || await getUnsplashImageForStory(story);
 
   return (
@@ -53,6 +55,8 @@ export async function HeroStory({ story, rank = 1 }: { story: Story; rank?: numb
         </div>
         <SourceBadges sources={story.sources} maxDisplay={6} />
       </div>
+
+      <SocialDiscussions socialData={story.socialDiscussions} />
 
       <div className="mt-auto flex flex-wrap items-center justify-between gap-4 border-t border-border pt-4">
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
