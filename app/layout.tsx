@@ -12,11 +12,11 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'PULSE — Media Intelligence Platform',
+  title: 'Wire Room — Media Intelligence Platform',
   description:
     'Aggregate news and trending content from many different outlets, organized by topic, with multi-source summaries and entity exploration.',
   openGraph: {
-    title: 'PULSE — Media Intelligence Platform',
+    title: 'Wire Room — Media Intelligence Platform',
     description:
       'What the world is talking about right now — multi-source news aggregation and media intelligence.',
     type: 'website',

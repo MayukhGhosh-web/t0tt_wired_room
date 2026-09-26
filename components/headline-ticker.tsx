@@ -1,9 +1,22 @@
 'use client';
 
-import { getTickerHeadlines } from '@/services/data';
+import Link from 'next/link';
 
-export function HeadlineTicker() {
-  const headlines = getTickerHeadlines();
+export interface TickerHeadline {
+  label: string;
+  text: string;
+  href: string;
+}
+
+export function HeadlineTicker({
+  headlines = [],
+}: {
+  headlines?: TickerHeadline[];
+}) {
+  // Hide the entire ticker when there are no headlines to avoid layout shift.
+  if (headlines.length === 0) return null;
+
+  // Duplicate the list so the CSS translateX(-50%) creates a seamless loop.
   const doubled = [...headlines, ...headlines];
 
   return (
@@ -17,13 +30,17 @@ export function HeadlineTicker() {
           <div className="relative flex-1 overflow-hidden">
             <div className="ticker-track flex gap-8 whitespace-nowrap">
               {doubled.map((h, i) => (
-                <span key={i} className="flex items-center gap-2 text-sm">
+                <Link
+                  key={i}
+                  href={h.href}
+                  className="flex items-center gap-2 text-sm transition-colors hover:text-foreground/70"
+                >
                   <span className="font-semibold uppercase tracking-wide text-muted-foreground">
                     {h.label}
                   </span>
                   <span className="text-foreground">{h.text}</span>
                   <span className="text-border">/</span>
-                </span>
+                </Link>
               ))}
             </div>
           </div>

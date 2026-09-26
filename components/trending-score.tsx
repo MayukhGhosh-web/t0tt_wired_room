@@ -23,7 +23,7 @@ export function TrendingScore({
           size === 'lg' && 'text-xs'
         )}
       >
-        Score
+        Temp
       </span>
       <span
         className={cn(

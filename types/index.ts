@@ -4,11 +4,8 @@ export type CategoryId =
   | 'science'
   | 'business'
   | 'world'
-  | 'india'
-  | 'education'
   | 'health'
-  | 'environment'
-  | 'culture'
+  | 'entertainment'
   | 'sports';
 
 export interface Category {

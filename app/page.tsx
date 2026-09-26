@@ -3,6 +3,7 @@ import {
   getTrendingStories,
   getStoriesByCategory,
   getCategories,
+  getTickerHeadlines,
 } from '@/services/data';
 import { HeadlineTicker } from '@/components/headline-ticker';
 import { HeroStory } from '@/components/hero-story';
@@ -11,15 +12,17 @@ import { StoryCarousel } from '@/components/story-carousel';
 import { CategorySection } from '@/components/category-section';
 import { formatFullDate, formatTime, getMinutesAgo } from '@/lib/format';
 import { ArrowRight } from 'lucide-react';
+import type { Category } from '@/types';
 
 export default async function HomePage() {
   const trending = await getTrendingStories();
+  const tickerHeadlines = await getTickerHeadlines();
   const topStory = trending[0];
   const secondaryStories = trending.slice(1, 5);
   const carouselStories = trending.slice(0, 8);
   const cats = getCategories();
 
-  const featuredCategories = ['politics', 'technology', 'science', 'business', 'world', 'india', 'health', 'environment'];
+  const featuredCategories = ['politics', 'technology', 'science', 'business', 'world', 'health', 'entertainment', 'sports'];
 
   const categoryStories = await Promise.all(
     featuredCategories.map(async (cat) => ({
@@ -30,7 +33,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <HeadlineTicker />
+      <HeadlineTicker headlines={tickerHeadlines} />
 
       <div className="mx-auto max-w-7xl px-4">
         <div className="py-8">
@@ -68,7 +71,9 @@ export default async function HomePage() {
 
       <div className="mx-auto max-w-7xl px-4">
         <StoryCarousel
-          stories={carouselStories}
+          items={carouselStories.map((story) => (
+            <StoryCard key={story.id} story={story} />
+          ))}
           title="Trending Now"
           href="/trending"
         />
@@ -78,9 +83,9 @@ export default async function HomePage() {
         stories.length > 0 ? (
           <div key={category} className="mx-auto max-w-7xl px-4">
             <CategorySection
-              title={cats.find((c) => c.id === category)?.label ?? category}
+              title={cats.find((c: Category) => c.id === category)?.label ?? category}
               stories={stories}
-              href={`/${category}`}
+              href={`/${cats.find((c: Category) => c.id === category)?.slug ?? category}`}
             />
           </div>
         ) : null
@@ -95,7 +100,7 @@ export default async function HomePage() {
             Dive into specific topics and see how different sources cover them.
           </p>
           <div className="flex flex-wrap justify-center gap-2">
-            {cats.map((c) => (
+            {cats.map((c: Category) => (
               <Link
                 key={c.id}
                 href={`/${c.slug}`}

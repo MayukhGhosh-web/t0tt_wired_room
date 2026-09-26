@@ -7,6 +7,7 @@ import { StoryCard } from '@/components/story-card';
 import { TrendingScore } from '@/components/trending-score';
 import { formatRelativeTime, formatFullDate } from '@/lib/format';
 import { ArrowLeft, ArrowRight, ExternalLink, KeyRound } from 'lucide-react';
+import { getUnsplashImageForStory } from '@/lib/unsplash';
 
 export default async function StoryPage({
   params,
@@ -18,6 +19,7 @@ export default async function StoryPage({
 
   const entities = await getEntitiesByIds(story.entityIds);
   const relatedStories = await getRelatedStories(story, 4);
+  const thumbnail = story.thumbnail || await getUnsplashImageForStory(story);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">
@@ -45,6 +47,12 @@ export default async function StoryPage({
               </span>
             )}
           </div>
+
+          {thumbnail && (
+            <div className="mb-6 w-full h-64 md:h-96 overflow-hidden rounded-md relative border border-border">
+               <img src={thumbnail} alt="" className="object-cover w-full h-full" />
+            </div>
+          )}
 
           <h1 className="mb-4 font-serif text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:text-5xl">
             {story.title}
@@ -104,7 +112,7 @@ export default async function StoryPage({
             </div>
             <SourceList sources={story.sources} />
             <p className="mt-4 text-xs text-muted-foreground">
-              PULSE aggregates headlines and summaries from multiple sources.
+              Wire Room aggregates headlines and summaries from multiple sources.
               Original articles remain the property of their publishers. Click
               through to read the full reporting.
             </p>

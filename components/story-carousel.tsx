@@ -6,11 +6,11 @@ import type { Story } from '@/types';
 import { StoryCard } from '@/components/story-card';
 
 export function StoryCarousel({
-  stories,
+  items,
   title,
   href,
 }: {
-  stories: Story[];
+  items: React.ReactNode[];
   title: string;
   href?: string;
 }) {
@@ -62,12 +62,12 @@ export function StoryCarousel({
         ref={scrollRef}
         className="no-scrollbar flex gap-4 overflow-x-auto scroll-smooth pb-2"
       >
-        {stories.map((story) => (
+        {items.map((node, i) => (
           <div
-            key={story.id}
+            key={i}
             className="w-[300px] shrink-0 md:w-[340px]"
           >
-            <StoryCard story={story} />
+            {node}
           </div>
         ))}
       </div>

@@ -4,10 +4,19 @@ import type { Story } from '@/types';
 import { TrendingScore } from '@/components/trending-score';
 import { SourceBadges } from '@/components/source-badges';
 import { formatRelativeTime } from '@/lib/format';
+import { getUnsplashImageForStory } from '@/lib/unsplash';
 
-export function HeroStory({ story, rank = 1 }: { story: Story; rank?: number }) {
+export async function HeroStory({ story, rank = 1 }: { story: Story; rank?: number }) {
+  const thumbnail = story.thumbnail || await getUnsplashImageForStory(story);
+
   return (
     <article className="group relative flex flex-col border border-border bg-card p-6 transition-all hover:border-foreground/30 md:p-8">
+      {thumbnail && (
+        <div className="mb-6 w-full h-64 md:h-80 overflow-hidden rounded-sm relative">
+           <img src={thumbnail} alt="" className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" />
+           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
+        </div>
+      )}
       <div className="mb-4 flex items-center gap-3">
         <span className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary font-mono text-sm font-bold text-primary-foreground">
           {rank}

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getCategories } from '@/services/data';
+import type { Category } from '@/types';
 
 export function Footer() {
   const cats = getCategories();
@@ -8,15 +9,10 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-6">
           <div className="col-span-2">
-            <div className="flex items-baseline gap-2">
-              <span className="font-serif text-2xl font-black tracking-tight">
-                PULSE
-              </span>
-              <span className="text-[10px] font-medium uppercase tracking-[0.15em] text-muted-foreground">
-                Media Intelligence
-              </span>
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="Wire Room" className="h-20 w-auto" />
             </div>
-            <p className="mt-3 max-w-xs text-sm text-muted-foreground">
+            <p className="mt-4 max-w-xs text-sm text-muted-foreground">
               Aggregating news from multiple sources to show what the world is
               talking about right now.
             </p>
@@ -27,7 +23,7 @@ export function Footer() {
               Sections
             </h4>
             <ul className="space-y-2">
-              {cats.slice(0, 5).map((c) => (
+              {cats.slice(0, 5).map((c: Category) => (
                 <li key={c.id}>
                   <Link
                     href={`/${c.slug}`}
@@ -45,7 +41,7 @@ export function Footer() {
               More
             </h4>
             <ul className="space-y-2">
-              {cats.slice(5).map((c) => (
+              {cats.slice(5).map((c: Category) => (
                 <li key={c.id}>
                   <Link
                     href={`/${c.slug}`}
@@ -64,7 +60,7 @@ export function Footer() {
             </h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/trending" className="text-sm text-foreground hover:underline">
+                <Link href="/" className="text-sm text-foreground hover:underline">
                   Trending
                 </Link>
               </li>
@@ -90,9 +86,9 @@ export function Footer() {
 
         <div className="mt-10 border-t border-border pt-6">
           <p className="text-xs text-muted-foreground">
-            PULSE aggregates and summarizes news from multiple sources. All
+            Wire Room aggregates and summarizes news from multiple sources. All
             original articles remain the property of their respective
-            publishers. PULSE does not reproduce complete articles. Always
+            publishers. Wire Room does not reproduce complete articles. Always
             refer to the original source for full reporting.
           </p>
         </div>

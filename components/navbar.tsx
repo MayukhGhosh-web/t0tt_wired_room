@@ -7,6 +7,7 @@ import { Search, Menu, X, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategories } from '@/services/data';
 import { SearchDialog } from '@/components/search-dialog';
+import type { Category } from '@/types';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -26,9 +27,8 @@ export function Navbar() {
   }, [pathname]);
 
   const navItems = [
-    { href: '/', label: 'Home' },
-    { href: '/trending', label: 'Trending' },
-    ...cats.map((c) => ({ href: `/${c.slug}`, label: c.label })),
+    { href: '/', label: 'Trending' },
+    ...cats.map((c: Category) => ({ href: `/${c.slug}`, label: c.label })),
   ];
 
   return (
@@ -40,15 +40,10 @@ export function Navbar() {
         )}
       >
         <div className="border-b border-border">
-          <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+          <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4">
             <div className="flex items-center gap-6">
-              <Link href="/" className="flex items-baseline gap-2">
-                <span className="font-serif text-2xl font-black tracking-tight">
-                  PULSE
-                </span>
-                <span className="hidden text-[10px] font-medium uppercase tracking-[0.15em] text-muted-foreground sm:inline">
-                  Media Intelligence
-                </span>
+              <Link href="/" className="flex items-center gap-2">
+                <img src="/logo.png" alt="Wire Room" className="h-16 w-auto" />
               </Link>
             </div>
 
@@ -59,7 +54,7 @@ export function Navbar() {
                 aria-label="Search"
               >
                 <Search className="h-4 w-4" />
-                <span className="hidden md:inline">Search PULSE</span>
+                <span className="hidden md:inline">Search Wire Room</span>
               </button>
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}

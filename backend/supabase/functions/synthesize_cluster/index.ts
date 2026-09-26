@@ -7,7 +7,7 @@ const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY") ?? "";
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 async function callGeminiJSON(prompt: string) {
-  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -30,14 +30,18 @@ async function synthesizeOne(clusterId: string): Promise<string> {
     .is('syndicated_from', null)
     .limit(15);
 
-  if (!articles || articles.length === 0) {
-    await supabase.from('clusters').update({ synthesis_status: 'failed' }).eq('id', clusterId);
-    return `${clusterId}: no articles, marked failed`;
+  if (!articles || articles.length < 2) {
+    // If a story doesn't match with any others, it's not a real trending cluster.
+    await supabase.from('clusters').update({ synthesis_status: 'failed', status: 'archived' }).eq('id', clusterId);
+    return `${clusterId}: only 1 article, marked failed/archived (requires >= 2)`;
   }
 
   const prompt = `
-    You are a neutral news synthesizer. Read the following articles about the same event.
-    Generate a synthesis with:
+    You are a neutral news synthesizer. Read the following articles.
+    CRITICAL RULE: If the articles provided below are completely unrelated to each other (e.g., a story about nature mixed with a story about politics), you MUST reject the cluster.
+    To reject, set "headline" to "REJECTED" and "category" to "REJECTED".
+    
+    If they DO match and are about the same underlying event or trend, generate a synthesis with:
     1. A neutral headline (max 15 words).
     2. A list of 2-4 shared facts that all sources agree on.
     3. The different perspectives or framings from each source (1 sentence each).
@@ -60,6 +64,12 @@ async function synthesizeOne(clusterId: string): Promise<string> {
   `;
 
   const synthesis = await callGeminiJSON(prompt);
+  
+  if (synthesis.headline === 'REJECTED' || synthesis.category === 'REJECTED') {
+    await supabase.from('clusters').update({ synthesis_status: 'failed', status: 'archived' }).eq('id', clusterId);
+    return `${clusterId}: rejected by LLM due to mismatched articles`;
+  }
+
   const volume = articles.length;
   const heat = Math.min(99, 40 + (volume * 8));
   const velocity = +(volume * 0.4).toFixed(1);
