@@ -91,7 +91,7 @@ export function SocialDiscussions({ socialData, compact = false }: { socialData?
           )}
 
           <div className={`mt-auto space-y-3 ${compact ? 'mt-3' : ''}`}>
-            {data.reddit.map((post) => (
+            {data.reddit.map((post: any) => (
               <a key={post.id} href={post.url} target="_blank" rel="noreferrer" className="block border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
                  <div className="flex items-center gap-2 mb-2 text-[10px] font-bold text-muted-foreground">
                     <span className="text-[#FF4500]">{post.author}</span>
