@@ -74,7 +74,32 @@ async function synthesizeOne(clusterId: string): Promise<string> {
   const heat = Math.min(99, 40 + (volume * 8));
   const velocity = +(volume * 0.4).toFixed(1);
 
-  await supabase.from('clusters').update({
+  let imageUrl = null;
+  const UNSPLASH_ACCESS_KEY = Deno.env.get("UNSPLASH_ACCESS_KEY");
+  if (UNSPLASH_ACCESS_KEY) {
+    try {
+      const cleanTitle = synthesis.headline.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+      const query = encodeURIComponent(cleanTitle.split(' ').slice(0, 4).join(' ') || synthesis.category);
+      const res = await fetch(`https://api.unsplash.com/search/photos?query=${query}&per_page=1&client_id=${UNSPLASH_ACCESS_KEY}`);
+      if (res.ok) {
+         const data = await res.json();
+         if (data.results && data.results.length > 0) {
+           imageUrl = data.results[0].urls.regular;
+         }
+      }
+      if (!imageUrl) {
+        const catRes = await fetch(`https://api.unsplash.com/search/photos?query=${synthesis.category || 'news'}&per_page=1&client_id=${UNSPLASH_ACCESS_KEY}`);
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          if (catData.results && catData.results.length > 0) imageUrl = catData.results[0].urls.regular;
+        }
+      }
+    } catch (e) {
+      console.error("Unsplash error:", e);
+    }
+  }
+
+  const updateData: any = {
     headline: synthesis.headline,
     synthesis_shared_facts: synthesis.shared_facts,
     synthesis_perspectives: synthesis.perspectives,
@@ -83,7 +108,13 @@ async function synthesizeOne(clusterId: string): Promise<string> {
     heat_index: heat,
     velocity: velocity,
     synthesis_status: 'resolved'
-  }).eq('id', clusterId);
+  };
+  
+  if (imageUrl) {
+    updateData.image_url = imageUrl;
+  }
+
+  await supabase.from('clusters').update(updateData).eq('id', clusterId);
 
   return `${clusterId}: resolved as "${synthesis.headline}"`;
 }

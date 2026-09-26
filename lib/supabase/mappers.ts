@@ -18,6 +18,7 @@ export interface ClusterRow {
   synthesis_shared_facts: string[] | null;
   entity_set: string[] | null;
   social_discussions: any | null;
+  image_url?: string | null;
 }
 
 export interface ArticleRow {
@@ -226,7 +227,7 @@ export function mapClusterToStory(
     sourceCount: articles.length,
     publishedAt,
     updatedAt,
-    thumbnail: undefined, // backend stores no story images
+    thumbnail: cluster.image_url ?? undefined,
     sources,
     entityIds,
     isBreaking: isBreakingStory(cluster.heat_index, cluster.velocity)

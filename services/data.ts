@@ -30,7 +30,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const CLUSTER_COLS =
-  'id,headline,label,category,heat_index,velocity,last_updated,created_at,synthesis_shared_facts,entity_set,social_discussions';
+  'id,headline,label,category,heat_index,velocity,last_updated,created_at,synthesis_shared_facts,entity_set,social_discussions,image_url';
 const ARTICLE_COLS =
   'id,source_name,title,snippet,url,published_at,cluster_id,created_at';
 const ARTICLE_ID_COLS = 'id,cluster_id';
