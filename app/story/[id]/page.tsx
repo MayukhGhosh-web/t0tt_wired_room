@@ -137,7 +137,7 @@ export default async function StoryPage({
         <aside className="space-y-4">
           <EntitySidebar entities={entities} />
 
-          <SocialDiscussions socialData={story.socialDiscussions} compact={true} />
+          <SocialDiscussions socialData={story.socialDiscussions} storyTitle={story.title} compact={true} />
 
           <div className="border border-border bg-card p-5">
             <h3 className="mb-3 font-serif text-lg font-bold tracking-tight">

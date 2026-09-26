@@ -1,7 +1,7 @@
 import { Tweet } from 'react-tweet';
 import { MessageSquare, ArrowUpCircle } from 'lucide-react';
 
-export function SocialDiscussions({ socialData, compact = false }: { socialData?: any, compact?: boolean }) {
+export function SocialDiscussions({ socialData, storyTitle, compact = false }: { socialData?: any, storyTitle?: string, compact?: boolean }) {
   if (!socialData || (!socialData.twitter?.length && !socialData.reddit?.length)) {
     return (
       <div className={`mt-8 mb-6 rounded-lg border border-red-100 bg-red-50/30 flex flex-col items-center justify-center text-center p-6 text-red-500`}>
@@ -12,6 +12,7 @@ export function SocialDiscussions({ socialData, compact = false }: { socialData?
   }
 
   const data = socialData;
+  const searchHeadline = storyTitle ? encodeURIComponent(storyTitle) : '';
 
   return (
     <div className={`mt-8 mb-6 rounded-lg border border-red-100 bg-red-50/30 flex flex-col relative overflow-hidden ${compact ? 'p-3 md:p-4' : 'p-4 md:p-6'}`}>
@@ -52,8 +53,10 @@ export function SocialDiscussions({ socialData, compact = false }: { socialData?
           )}
 
           <div className={`mt-auto space-y-4 ${compact ? 'mt-3' : ''}`}>
-            {data.twitter.map((tweet: any) => (
-              <div key={tweet.id} className="border border-border rounded-xl p-4 bg-background">
+            {data.twitter.map((tweet: any) => {
+              const xUrl = tweet.url || (searchHeadline ? `https://twitter.com/search?q=${searchHeadline}` : '#');
+              return (
+              <a href={xUrl} target="_blank" rel="noreferrer" key={tweet.id} className="block border border-border rounded-xl p-4 bg-background hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center font-bold text-xs uppercase">{tweet.author.slice(0, 2)}</div>
                   <div className="flex flex-col">
@@ -67,8 +70,8 @@ export function SocialDiscussions({ socialData, compact = false }: { socialData?
                   <span className="flex items-center gap-1">🔁 {tweet.metrics?.reposts?.toLocaleString()}</span>
                   <span className="flex items-center gap-1 text-red-500">❤️ {tweet.metrics?.likes?.toLocaleString()}</span>
                 </div>
-              </div>
-            ))}
+              </a>
+            )})}
           </div>
         </div>
 
@@ -91,8 +94,12 @@ export function SocialDiscussions({ socialData, compact = false }: { socialData?
           )}
 
           <div className={`mt-auto space-y-3 ${compact ? 'mt-3' : ''}`}>
-            {data.reddit.map((post: any) => (
-              <a key={post.id} href={post.url} target="_blank" rel="noreferrer" className="block border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
+            {data.reddit.map((post: any) => {
+              const rUrl = (!post.url || post.url === 'https://reddit.com/r/news') && searchHeadline 
+                ? `https://www.reddit.com/search/?q=${searchHeadline}` 
+                : (post.url || '#');
+              return (
+              <a key={post.id} href={rUrl} target="_blank" rel="noreferrer" className="block border border-border rounded-lg p-3 hover:bg-muted/50 transition-colors">
                  <div className="flex items-center gap-2 mb-2 text-[10px] font-bold text-muted-foreground">
                     <span className="text-[#FF4500]">{post.author}</span>
                  </div>
@@ -102,7 +109,7 @@ export function SocialDiscussions({ socialData, compact = false }: { socialData?
                     <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3 md:w-4 md:h-4" /> {post.metrics?.replies?.toLocaleString()}</span>
                  </div>
               </a>
-            ))}
+            )})}
           </div>
         </div>
 
